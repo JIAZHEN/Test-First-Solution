@@ -26,14 +26,13 @@ class RPNCalculator
 
   def calculate(sym)
     raise "calculator is empty" if @stack.empty?
-    b, a = @stack.pop, @value ? @value : @stack.pop
+    b, a = @stack.pop, @stack.pop
     @value = a.to_f.send(sym, b)
+    push @value
   end
 
   def value
-    result = @value
-    @value = nil if @stack.empty?
-    result
+    @value
   end
 
   def tokens(str)
