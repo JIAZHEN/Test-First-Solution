@@ -2,19 +2,13 @@ class Fixnum
 
   def in_words
     words = []
-    words << thousands(self) unless self / 1_000 == 0
-    words << hundreds(self) unless (self / 100 == 0 || self % 1_000 == 0)
-    if self.between?(0,9)
-      words << in_ten(self)
-    elsif (self % 100).between?(10, 19)
-      words << teens(self % 100)
-    elsif (self % 100).between?(1,9)
-      words << in_ten(self % 100)
-    elsif self % 100 != 0 and self % 1_000 != 0
-      words << tens(self % 100)
-      words << in_ten(self % 10) unless self % 10 == 0
-    end
-    words.join(" ")
+    words << over_hunreds(self / 1_000_000_000_000, 'trillion')
+    words << over_hunreds(self % 1_000_000_000_000 / 1_000_000_000, 'billion')
+    words << over_hunreds(self % 1_000_000_000_000 % 1_000_000_000 / 1_000_000, 'million')
+    words << over_hunreds(self % 1_000_000_000_000 % 1_000_000_000 % 1_000_000 / 1_000, 'thousand')
+    words << over_hunreds(self % 1_000_000_000_000 % 1_000_000_000 % 1_000_000 % 1_000 / 100, 'hundred')
+    words << in_hundred(self % 100, self < 100)
+    words.compact.join(' ')
   end
 
   private
@@ -38,8 +32,10 @@ class Fixnum
         'seven'
       when 8
         'eight'
-      else
+      when 9
         'nine'
+      else
+        ''
       end
     end
 
@@ -63,8 +59,10 @@ class Fixnum
         'seventeen'
       when 18
         'eighteen'
-      else
+      when 19
         'nineteen'
+      else
+        ''
       end
     end
 
@@ -84,29 +82,29 @@ class Fixnum
         'seventy'
       when 8
         'eighty'
-      else
+      when 9
         'ninety'
+      else
+        ''
       end
     end
 
-    def in_hundred(n)
-      if n.between?(0,9)
+    def in_hundred(n, included_zero = false)
+      if n.between?(included_zero ? 0 : 1, 9)
         in_ten(n)
+      elsif n == 0
+        nil
       elsif n.between?(10,19)
         teens(n)
+      elsif n % 10 == 0
+        tens(n)
       else
-        tens(n) + in_ten(n % 10)
+        "#{tens(n)} #{in_ten(n % 10)}"
       end
     end
 
-    def hundreds(n)
-      in_ten(n / 100) + ' hundred'
+    def over_hunreds(n, unit)
+      "#{over_hunreds(n / 100, 'hundred')} #{in_hundred(n % 100)} #{unit}".strip unless n == 0
     end
-
-    def thousands(n)
-      in_ten(n / 1000) + ' thousand'
-    end
-
-
 
 end
