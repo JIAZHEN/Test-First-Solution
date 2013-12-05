@@ -2,11 +2,11 @@ class Fixnum
 
   def in_words
     words = []
-    words << over_hunreds(self / 1_000_000_000_000, 'trillion')
-    words << over_hunreds(self % 1_000_000_000_000 / 1_000_000_000, 'billion')
-    words << over_hunreds(self % 1_000_000_000_000 % 1_000_000_000 / 1_000_000, 'million')
-    words << over_hunreds(self % 1_000_000_000_000 % 1_000_000_000 % 1_000_000 / 1_000, 'thousand')
-    words << over_hunreds(self % 1_000_000_000_000 % 1_000_000_000 % 1_000_000 % 1_000 / 100, 'hundred')
+    words << over_hunreds(self / 10**12, 'trillion')
+    words << over_hunreds(self % 10**12 / 10**9, 'billion')
+    words << over_hunreds(self % 10**12 % 10**9 / 10**6, 'million')
+    words << over_hunreds(self % 10**12 % 10**9 % 10**6 / 10**3, 'thousand')
+    words << over_hunreds(self % 10**12 % 10**9 % 10**6 % 10**3 / 100, 'hundred')
     words << in_hundred(self % 100, self < 100)
     words.compact.join(' ')
   end
