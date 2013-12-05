@@ -89,6 +89,16 @@ class Fixnum
       end
     end
 
+    def in_hundred(n)
+      if n.between?(0,9)
+        in_ten(n)
+      elsif n.between?(10,19)
+        teens(n)
+      else
+        tens(n) + in_ten(n % 10)
+      end
+    end
+
     def hundreds(n)
       in_ten(n / 100) + ' hundred'
     end
