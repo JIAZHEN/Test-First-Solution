@@ -1,110 +1,73 @@
 class Fixnum
 
   def in_words
-    words = []
-    words << over_hunreds(self / 10**12, 'trillion')
-    words << over_hunreds(self % 10**12 / 10**9, 'billion')
-    words << over_hunreds(self % 10**12 % 10**9 / 10**6, 'million')
-    words << over_hunreds(self % 10**12 % 10**9 % 10**6 / 10**3, 'thousand')
-    words << over_hunreds(self % 10**12 % 10**9 % 10**6 % 10**3 / 100, 'hundred')
-    words << in_hundred(self % 100, self < 100)
-    words.compact.join(' ')
+    IN_A_WORD[self] || in_hundred(self)
+  end
+
+  def digits
+    to_s.length
   end
 
   private
-    def in_ten(n)
-      case n
-      when 0
-        'zero'
-      when 1
-        'one'
-      when 2
-        'two'
-      when 3
-        'three'
-      when 4
-        'four'
-      when 5
-        'five'
-      when 6
-        'six'
-      when 7
-        'seven'
-      when 8
-        'eight'
-      when 9
-        'nine'
-      else
-        ''
-      end
-    end
+  IN_A_WORD = {
+    0  => "zero",
+    1  => "one",
+    2  => "two",
+    3  => "three",
+    4  => "four",
+    5  => "five",
+    6  => "six",
+    7  => "seven",
+    8  => "eight",
+    9  => "nine",
+    10 => "ten",
+    11 => "eleven",
+    12 => "twelve",
+    13 => "thirteen",
+    14 => "fourteen",
+    15 => "fifteen",
+    16 => "sixteen",
+    17 => "seventeen",
+    18 => "eighteen",
+    19 => "nineteen",
+    20 => "twenty",
+    30 => "thirty",
+    40 => "forty",
+    50 => "fifty",
+    60 => "sixty",
+    70 => "seventy",
+    80 => "eighty",
+    90 => "ninety"
+  }
 
-    def teens(n)
-      case n
-      when 10
-        'ten'
-      when 11
-        'eleven'
-      when 12
-        'twelve'
-      when 13
-        'thirteen'
-      when 14
-        'fourteen'
-      when 15
-        'fifteen'
-      when 16
-        'sixteen'
-      when 17
-        'seventeen'
-      when 18
-        'eighteen'
-      when 19
-        'nineteen'
-      else
-        ''
-      end
-    end
+  MAGNITUDE_WORD = {
+    1000000000000 => "trillion",
+    1000000000    => "billion",
+    1000000       => "million",
+    1000          => "thousand",
+    100           => "hundred"
+  }
 
-    def tens(n)
-      case n / 10
-      when 2
-        'twenty'
-      when 3
-        'thirty'
-      when 4
-        'forty'
-      when 5
-        'fifty'
-      when 6
-        'sixty'
-      when 7
-        'seventy'
-      when 8
-        'eighty'
-      when 9
-        'ninety'
-      else
-        ''
-      end
+  def split_by_unit(n)
+    result, n_dump = [], n
+    MAGNITUDE_WORD.each do |magnitude, name|
+      puts n_dump / magnitude
+      result << "#{in_hundred(n_dump / magnitude)} #{name}" if n_dump / magnitude > 0
+      n_dump = n_dump % magnitude
     end
+    result << in_hundred(n_dump) if n > 0
+    result.join(' ')
+  end
 
-    def in_hundred(n, included_zero = false)
-      if n.between?(included_zero ? 0 : 1, 9)
-        in_ten(n)
-      elsif n == 0
-        nil
-      elsif n.between?(10,19)
-        teens(n)
-      elsif n % 10 == 0
-        tens(n)
-      else
-        "#{tens(n)} #{in_ten(n % 10)}"
-      end
-    end
+  def in_hundred(n)
+    result = []
+    result << IN_A_WORD[n / 10 * 10] if n / 10 > 0
+    result << IN_A_WORD[n % 10]
+    result.join(' ')
+  end
 
-    def over_hunreds(n, unit)
-      "#{over_hunreds(n / 100, 'hundred')} #{in_hundred(n % 100)} #{unit}".strip unless n == 0
-    end
+  def over_hunreds(n, unit)
+    "#{over_hunreds(n / 100, 'hundred')} #{in_hundred(n % 100)} #{unit}".strip unless n == 0
+  end
 
 end
