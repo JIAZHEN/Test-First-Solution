@@ -1,7 +1,7 @@
 class Fixnum
 
   def in_words
-    IN_A_WORD[self] || in_hundred(self)
+    IN_A_WORD[self] || long_words(self)
   end
 
   def digits
@@ -44,30 +44,30 @@ class Fixnum
     1000000000000 => "trillion",
     1000000000    => "billion",
     1000000       => "million",
-    1000          => "thousand",
-    100           => "hundred"
+    1000          => "thousand"
   }
 
-  def split_by_unit(n)
+  def long_words(n)
     result, n_dump = [], n
     MAGNITUDE_WORD.each do |magnitude, name|
-      puts n_dump / magnitude
-      result << "#{in_hundred(n_dump / magnitude)} #{name}" if n_dump / magnitude > 0
+      result << "#{in_thousand(n_dump / magnitude)} #{name}" if n_dump / magnitude > 0
       n_dump = n_dump % magnitude
     end
-    result << in_hundred(n_dump) if n > 0
+    result << in_thousand(n_dump) if n_dump > 0
     result.join(' ')
   end
 
-  def in_hundred(n)
+  def in_thousand(n)
     result = []
-    result << IN_A_WORD[n / 10 * 10] if n / 10 > 0
-    result << IN_A_WORD[n % 10]
+    quotient, remainder = n.divmod(100)
+    result << IN_A_WORD[quotient] + " hundred" if quotient > 0
+    if IN_A_WORD[remainder] && remainder > 0
+      result << IN_A_WORD[remainder]
+    else
+      quotient, remainder = remainder.divmod(10)
+      result << IN_A_WORD[quotient * 10] if quotient > 0
+      result << IN_A_WORD[remainder] if remainder > 0
+    end
     result.join(' ')
   end
-
-  def over_hunreds(n, unit)
-    "#{over_hunreds(n / 100, 'hundred')} #{in_hundred(n % 100)} #{unit}".strip unless n == 0
-  end
-
 end
